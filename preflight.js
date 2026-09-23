@@ -1,6 +1,6 @@
 // Lightweight startup guard: clears legacy Three Minds browser data once without reloading the page.
 (function(){
-  const VERSION='tmh3_preflight_v2';
+  const VERSION='tmh3_preflight_v3';
   if(localStorage.getItem(VERSION)==='done') return;
   const keys=[];
   for(let i=0;i<localStorage.length;i++){
