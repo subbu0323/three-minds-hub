@@ -2,126 +2,19 @@
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
   const KEY = 'tmh3_remember';
-
-  function loadBrandIcons() {
-    const social = $('.social');
-    if (!social) return;
-    social.innerHTML = `
-      <a aria-label="Facebook" title="Facebook" href="https://www.facebook.com/" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
-      <a aria-label="Instagram" title="Instagram" href="https://www.instagram.com/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
-      <a aria-label="X / Twitter" title="X / Twitter" href="https://x.com/" target="_blank" rel="noopener"><i class="fa-brands fa-x-twitter"></i></a>
-      <a aria-label="WhatsApp" title="WhatsApp" href="https://web.whatsapp.com/" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i></a>
-      <a aria-label="YouTube" title="YouTube" href="https://www.youtube.com/" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a>
-      <a aria-label="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in"></i></a>`;
-  }
-
-  function makeFlag() {
-    const old = $('.flagIndia');
-    if (!old) return;
-    old.innerHTML = `<svg viewBox="0 0 24 16" aria-label="India flag" role="img"><rect width="24" height="16" rx="1" fill="#fff"/><rect width="24" height="5.33" fill="#ff9933"/><rect y="10.67" width="24" height="5.33" fill="#138808"/><circle cx="12" cy="8" r="2.1" fill="none" stroke="#000080" stroke-width=".55"/><path d="M12 5.7v4.6M9.7 8h4.6M10.4 6.4l3.2 3.2M13.6 6.4l-3.2 3.2" stroke="#000080" stroke-width=".28"/></svg>`;
-  }
-
-  function installRememberMe() {
-    const pass = $('#pass');
-    if (!pass || $('#rememberMe')) return;
-    const row = document.createElement('label');
-    row.id = 'rememberRow';
-    row.innerHTML = `<input id="rememberMe" type="checkbox"><span>Remember me on this device</span>`;
-    pass.insertAdjacentElement('afterend', row);
-    const saved = localStorage.getItem(KEY) === '1';
-    $('#rememberMe').checked = saved;
-    if (saved) {
-      const last = localStorage.getItem('tmh3_last_member');
-      if (last && $('#who').querySelector(`option[value="${last}"]`)) $('#who').value = last;
-    }
-  }
-
-  function firstMemberFirst() {
-    if (!window.members || !window.cur) return;
-    const grid = $('#profilesGrid');
-    if (!grid) return;
-    const current = window.members.find(x => x.id === window.cur);
-    if (!current) return;
-    const card = [...grid.children].find(el => el.querySelector('h4')?.textContent === current.name);
-    if (card && grid.firstElementChild !== card) grid.prepend(card);
-  }
-
-  function patchDeleteButtons(root = document) {
-    root.querySelectorAll('button').forEach(b => {
-      const t = b.textContent.trim().toLowerCase();
-      if (t.includes('delete') && !b.querySelector('i')) {
-        b.innerHTML = '<i class="fa-regular fa-trash-can" aria-hidden="true"></i><span class="deleteLabel"> Delete</span>';
-        b.setAttribute('aria-label', 'Delete');
-        b.title = 'Delete';
-      }
-    });
-  }
-
-  function improveLogin() {
-    const card = $('.loginCard');
-    if (!card) return;
-    card.classList.add('premiumLogin');
-    const title = card.querySelector('h1');
-    if (title) title.innerHTML = `Welcome back<span class="titleDot">.</span>`;
-    const small = card.querySelector('small');
-    if (small) small.textContent = 'A private digital space for Subramaniam, Pradap and Kalaivani.';
-  }
-
-  function closeMenuOnNavigation() {
-    $$('#menu a').forEach(a => a.addEventListener('click', () => $('#menu')?.classList.remove('open')));
-  }
-
-  function loginRememberHook() {
-    const signin = $('#signin');
-    if (!signin || signin.dataset.rememberHook) return;
-    signin.dataset.rememberHook = '1';
-    signin.addEventListener('click', () => {
-      setTimeout(() => {
-        const member = $('#who')?.value;
-        if ($('#rememberMe')?.checked && member) {
-          localStorage.setItem(KEY, '1');
-          localStorage.setItem('tmh3_last_member', member);
-        } else {
-          localStorage.removeItem(KEY);
-          localStorage.removeItem('tmh3_last_member');
-        }
-      }, 50);
-    });
-  }
-
-  function watchRender() {
-    const grid = $('#profilesGrid');
-    if (grid) new MutationObserver(() => firstMemberFirst()).observe(grid, {childList:true});
-    const obs = new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => {
-      if (n.nodeType === 1) patchDeleteButtons(n);
-    })));
-    obs.observe(document.body, {childList:true,subtree:true});
-  }
-
-  function enhanceCampfire() {
-    const hero = $('.heroLogo');
-    if (!hero) return;
-    hero.innerHTML = `<div class="premiumCampfire" aria-label="Three Minds digital campfire"><div class="skyGlow"></div><div class="stars">✦　·　✦　　 ·　✦<br>　·　　 ✦　　·<br>✦　　·　　　✦</div><div class="bigMoon"></div><div class="mountain m1"></div><div class="mountain m2"></div><div class="ground"></div><div class="fireGlow"></div><div class="logs"><span></span><span></span></div><div class="flame"><i></i><b></b></div><div class="campfireText"><strong>Our digital campfire</strong><span>Where memories glow and three minds grow.</span></div></div>`;
-    const p = $('.hero>div:first-child>p:not(.eyebrow)');
-    if (p) p.textContent = 'A private, beautifully crafted space where three friends keep memories, share moments and grow their skills together.';
-  }
-
-  function init() {
-    installRememberMe();
-    improveLogin();
-    loadBrandIcons();
-    makeFlag();
-    enhanceCampfire();
-    closeMenuOnNavigation();
-    loginRememberHook();
-    patchDeleteButtons();
-    firstMemberFirst();
-    watchRender();
-    const app = $('#app');
-    if (app) new MutationObserver(() => {
-      loadBrandIcons(); makeFlag(); firstMemberFirst(); patchDeleteButtons(); loginRememberHook();
-    }).observe(app, {childList:true,subtree:true});
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  function addCSS(){const s=document.createElement('style');s.textContent=`
+    #rememberRow{display:flex!important;align-items:center!important;gap:9px!important;width:auto!important;margin:2px 0 6px!important;color:var(--muted);font-size:12px;cursor:pointer}.loginCard #rememberRow input{width:17px!important;height:17px!important;accent-color:#e85d3f;margin:0}.premiumLogin{background:linear-gradient(145deg,var(--card),#f2eadf)!important;border:1px solid #e3d5c3!important}.dark .premiumLogin,body.dark .premiumLogin{background:linear-gradient(145deg,var(--card),#141612)!important}.titleDot{color:var(--a)}.premiumCampfire{width:min(500px,92vw);aspect-ratio:1.08;border-radius:36px;position:relative;overflow:hidden;background:linear-gradient(180deg,#07162d 0%,#102b4a 47%,#172119 48%,#0b0d0b 100%);box-shadow:0 30px 80px #0003;border:1px solid #ffffff30}.premiumCampfire:after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 72%,#ff8a2420,transparent 30%),linear-gradient(180deg,transparent 60%,#0007)}.skyGlow{position:absolute;inset:0;background:radial-gradient(circle at 70% 25%,#ffe9a933,transparent 25%)}.stars{position:absolute;top:25px;left:28px;color:#fff9;font-size:14px;line-height:2.3;letter-spacing:4px}.bigMoon{position:absolute;right:13%;top:10%;width:82px;height:82px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fffdf1,#ffe7a5 65%,#e9c76e);box-shadow:0 0 50px #ffe8a566}.mountain{position:absolute;bottom:34%;width:75%;height:28%;background:#101a19;clip-path:polygon(0 100%,32% 34%,47% 63%,68% 8%,100% 100%)}.m1{left:-15%}.m2{right:-28%;transform:scaleX(-1);opacity:.7}.ground{position:absolute;left:-5%;right:-5%;bottom:-10%;height:46%;background:radial-gradient(ellipse at 50% 20%,#273326,#080a08 62%);border-radius:50%}.fireGlow{position:absolute;left:34%;bottom:18%;width:32%;height:38%;border-radius:50%;background:#ff762c33;filter:blur(22px)}.logs{position:absolute;left:39%;bottom:20%;width:22%;height:25px;z-index:4}.logs span{position:absolute;width:100%;height:18px;border-radius:12px;background:linear-gradient(90deg,#3b2116,#a45c32,#4a281b);box-shadow:0 5px 8px #0007}.logs span:first-child{transform:rotate(18deg)}.logs span:last-child{transform:rotate(-18deg)}.flame{position:absolute;z-index:5;left:42%;bottom:25%;width:16%;height:30%;background:linear-gradient(#fff4a3,#ffd43d 35%,#ff6b25 70%,transparent);clip-path:polygon(50% 0,68% 29%,92% 55%,78% 100%,22% 100%,8% 55%,35% 30%);filter:drop-shadow(0 0 18px #ff7b2e)}.flame i{position:absolute;left:35%;top:28%;width:30%;height:55%;background:#fff8bd;clip-path:polygon(50% 0,100% 65%,72% 100%,28% 100%,0 65%)}.campfireText{position:absolute;z-index:8;left:25px;right:25px;bottom:24px;color:#fff;display:flex;flex-direction:column;text-shadow:0 2px 8px #000}.campfireText strong{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#ffc86a}.campfireText span{font-size:18px;font-weight:750;max-width:390px}.social{gap:18px!important}.social a{width:auto!important;height:auto!important;color:var(--ink)!important;font-size:25px!important;transition:.2s}.social a:hover{transform:translateY(-3px);color:var(--a)!important}.social i{font-style:normal}.flagIndia{width:28px!important;height:19px!important;background:transparent!important;border:0!important;box-shadow:none!important}.flagIndia svg{width:100%;height:100%;display:block}.headerTools{gap:12px!important}.deleteLabel{font-size:11px}.file button i,.rowDelete i,.dangerText i{font-size:13px}.max10{font-size:13px!important;font-weight:750!important}.premiumCampfire~*{z-index:2}@media(max-width:600px){.premiumCampfire{width:310px;border-radius:27px}.campfireText span{font-size:15px}.bigMoon{width:65px;height:65px}.social{gap:14px!important}}
+  `;document.head.appendChild(s)}
+  function loadBrandIcons(){const social=$('.social');if(!social)return;social.innerHTML=`<a aria-label="Facebook" title="Facebook" href="https://www.facebook.com/" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a><a aria-label="Instagram" title="Instagram" href="https://www.instagram.com/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a><a aria-label="X / Twitter" title="X / Twitter" href="https://x.com/" target="_blank" rel="noopener"><i class="fa-brands fa-x-twitter"></i></a><a aria-label="WhatsApp" title="WhatsApp" href="https://web.whatsapp.com/" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i></a><a aria-label="YouTube" title="YouTube" href="https://www.youtube.com/" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a><a aria-label="LinkedIn" title="LinkedIn" href="https://www.linkedin.com/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in"></i></a>`}
+  function makeFlag(){const old=$('.flagIndia');if(!old)return;old.innerHTML=`<svg viewBox="0 0 24 16" aria-label="India flag" role="img"><rect width="24" height="16" rx="1" fill="#fff"/><rect width="24" height="5.33" fill="#ff9933"/><rect y="10.67" width="24" height="5.33" fill="#138808"/><circle cx="12" cy="8" r="2.1" fill="none" stroke="#000080" stroke-width=".55"/><path d="M12 5.7v4.6M9.7 8h4.6M10.4 6.4l3.2 3.2M13.6 6.4l-3.2 3.2" stroke="#000080" stroke-width=".28"/></svg>`}
+  function installRememberMe(){const pass=$('#pass');if(!pass||$('#rememberMe'))return;const row=document.createElement('label');row.id='rememberRow';row.innerHTML='<input id="rememberMe" type="checkbox"><span>Remember me on this device</span>';pass.insertAdjacentElement('afterend',row);const saved=localStorage.getItem(KEY)==='1';$('#rememberMe').checked=saved;if(saved){const last=localStorage.getItem('tmh3_last_member');if(last&&$('#who').querySelector(`option[value="${last}"]`))$('#who').value=last}}
+  function firstMemberFirst(){const grid=$('#profilesGrid');if(!grid)return;const id=localStorage.getItem('tmh3_cur');const name=window.members?.find?.(x=>x.id===id)?.name;if(!name)return;const card=[...grid.children].find(el=>el.querySelector('h4')?.textContent===name);if(card&&grid.firstElementChild!==card)grid.prepend(card)}
+  function patchDeleteButtons(root=document){root.querySelectorAll('button').forEach(b=>{const t=b.textContent.trim().toLowerCase();if(t.includes('delete')&&!b.querySelector('i')){b.innerHTML='<i class="fa-regular fa-trash-can" aria-hidden="true"></i><span class="deleteLabel"> Delete</span>';b.setAttribute('aria-label','Delete');b.title='Delete'}})}
+  function improveLogin(){const card=$('.loginCard');if(!card)return;card.classList.add('premiumLogin');const title=card.querySelector('h1');if(title)title.innerHTML='Welcome back<span class="titleDot">.</span>';const small=card.querySelector('small');if(small)small.textContent='A private digital space for Subramaniam, Pradap and Kalaivani.'}
+  function closeMenuOnNavigation(){$$('#menu a').forEach(a=>a.addEventListener('click',()=>$('#menu')?.classList.remove('open')))}
+  function loginRememberHook(){const signin=$('#signin');if(!signin||signin.dataset.rememberHook)return;signin.dataset.rememberHook='1';signin.addEventListener('click',()=>setTimeout(()=>{const member=$('#who')?.value;if($('#rememberMe')?.checked&&member){localStorage.setItem(KEY,'1');localStorage.setItem('tmh3_last_member',member)}else{localStorage.removeItem(KEY);localStorage.removeItem('tmh3_last_member')}},50))}
+  function watch(){const obs=new MutationObserver(()=>{loadBrandIcons();makeFlag();firstMemberFirst();patchDeleteButtons();loginRememberHook()});obs.observe(document.body,{childList:true,subtree:true})}
+  function enhanceCampfire(){const hero=$('.heroLogo');if(!hero)return;hero.innerHTML='<div class="premiumCampfire" aria-label="Three Minds digital campfire"><div class="skyGlow"></div><div class="stars">✦　·　✦　　 ·　✦<br>　·　　 ✦　　·<br>✦　　·　　　✦</div><div class="bigMoon"></div><div class="mountain m1"></div><div class="mountain m2"></div><div class="ground"></div><div class="fireGlow"></div><div class="logs"><span></span><span></span></div><div class="flame"><i></i></div><div class="campfireText"><strong>Our digital campfire</strong><span>Where memories glow and three minds grow.</span></div></div>';const p=$('.hero>div:first-child>p:not(.eyebrow)');if(p)p.textContent='A private, beautifully crafted space where three friends keep memories, share moments and grow their skills together.'}
+  function init(){addCSS();installRememberMe();improveLogin();loadBrandIcons();makeFlag();enhanceCampfire();closeMenuOnNavigation();loginRememberHook();patchDeleteButtons();firstMemberFirst();watch()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
